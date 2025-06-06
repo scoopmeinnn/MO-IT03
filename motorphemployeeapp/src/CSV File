@@ -1,0 +1,24 @@
+public static void saveToCSV(Employee emp, List<AttendanceLog> logs, double gross, double deductions, double bonus, double net) {
+    try {
+        String fileName = emp.getEmployeeNumber() + "_Payslip.csv";
+        java.io.PrintWriter writer = new java.io.PrintWriter(fileName);
+
+        writer.println("Date,Hours Worked,Daily Pay");
+        for (AttendanceLog log : logs) {
+            long hours = log.getWorkedHours();
+            double dailyPay = hours * emp.getHourlyRate();
+            writer.println(log.getTimeIn().toLocalDate() + "," + hours + "," + String.format("%.2f", dailyPay));
+        }
+
+        writer.println();
+        writer.println("Gross Pay," + String.format("%.2f", gross));
+        writer.println("Bonus," + String.format("%.2f", bonus));
+        writer.println("Total Deductions," + String.format("%.2f", deductions));
+        writer.println("Net Pay," + String.format("%.2f", net));
+
+        writer.close();
+        System.out.println("Payslip exported to: " + fileName);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}

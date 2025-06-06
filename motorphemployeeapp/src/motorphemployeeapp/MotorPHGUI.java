@@ -11,18 +11,24 @@ package motorphemployeeapp;
 
 /**
  *
- * @author elias
+ * @author kate
  */
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MotorPHGUI extends JFrame {
 
-    private JTextField txtEmpNumber, txtStartDate, txtEndDate;
-    private JTextArea txtResult;
+    private final JTextField txtEmpNumber;
+
+    private final JTextField txtStartDate;
+    private final JTextField txtEndDate;
+    private final JTextArea txtResult;
 
     public MotorPHGUI() {
         setTitle("MotorPH Employee App");
@@ -30,7 +36,6 @@ public class MotorPHGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Top Input Panel
         JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Payslip Generator"));
 
@@ -51,7 +56,6 @@ public class MotorPHGUI extends JFrame {
         inputPanel.add(btnGenerate);
         inputPanel.add(btnExit);
 
-        // Result Area
         txtResult = new JTextArea();
         txtResult.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(txtResult);
@@ -60,7 +64,6 @@ public class MotorPHGUI extends JFrame {
         add(inputPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Button Actions
         btnGenerate.addActionListener(e -> generatePayslip());
         btnExit.addActionListener(e -> System.exit(0));
     }
@@ -70,13 +73,11 @@ public class MotorPHGUI extends JFrame {
         String startDateStr = txtStartDate.getText().trim();
         String endDateStr = txtEndDate.getText().trim();
 
-        // Validate employee number
         if (!empNum.matches("EMP\\d{3}")) {
             showError("Invalid Employee Number. Format must be EMP###.");
             return;
         }
 
-        // Validate dates
         LocalDate startDate, endDate;
         try {
             startDate = LocalDate.parse(startDateStr);
@@ -90,10 +91,12 @@ public class MotorPHGUI extends JFrame {
             return;
         }
 
-        // Create sample employee
-        Employee emp = new Employee(empNum, "Cruz", "Juan", "Developer", 200.0);
+        Employee emp = new Employee(empNum, "Plenos", "Catherine", "Agent", 200.0);
 
-        // Add sample logs (simulate within date range)
+        // Clear previous logs (for demo purposes)
+        AttendanceLog.clearLogs();
+
+        // Sample logs within range
         AttendanceLog.addAttendance(new AttendanceLog(empNum,
                 LocalDateTime.of(2025, 5, 14, 9, 0),
                 LocalDateTime.of(2025, 5, 14, 17, 0)));
@@ -102,14 +105,12 @@ public class MotorPHGUI extends JFrame {
                 LocalDateTime.of(2025, 5, 15, 9, 30),
                 LocalDateTime.of(2025, 5, 15, 18, 0)));
 
-        // Compute payroll
         PayrollSystem payrollSystem = new PayrollSystem();
         double netPay = payrollSystem.generatePayslip(emp);
 
-        // Show result
         txtResult.setText("Payslip for: " + emp.getFullName() + "\n" +
-                          "Employee Number: " + emp.getEmployeeNumber() + "\n" +
-                          "Net Pay: PHP " + String.format("%.2f", netPay));
+                "Employee Number: " + emp.getEmployeeNumber() + "\n" +
+                "Net Pay: PHP " + String.format("%.2f", netPay));
     }
 
     private void showError(String message) {
@@ -124,44 +125,76 @@ public class MotorPHGUI extends JFrame {
     }
 
     private static class Employee {
+        private final String employeeNumber;
+        private final String lastName;
+        private final String firstName;
+        private final double hourlyRate;
 
-        public Employee() {
+        public Employee(String employeeNumber, String lastName, String firstName, String position, double hourlyRate) {
+            this.employeeNumber = employeeNumber;
+            this.lastName = lastName;
+            this.firstName = firstName;
+            this.hourlyRate = hourlyRate;
         }
 
-        private Employee(String cruz, String juan, String developer, String developer1, double d) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        public String getFullName() {
+            return firstName + " " + lastName;
         }
 
-        private String getFullName() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        public String getEmployeeNumber() {
+            return employeeNumber;
         }
 
-        private String getEmployeeNumber() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        public double getHourlyRate() {
+            return hourlyRate;
         }
     }
 
     private static class AttendanceLog {
+        private final String employeeNumber;
+        private final LocalDateTime timeIn;
+        private final LocalDateTime timeOut;
 
-        private static void addAttendance() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        private static final List<AttendanceLog> logs = new ArrayList<>();
+
+        public AttendanceLog(String employeeNumber, LocalDateTime timeIn, LocalDateTime timeOut) {
+            this.employeeNumber = employeeNumber;
+            this.timeIn = timeIn;
+            this.timeOut = timeOut;
         }
 
-        private static void addAttendance(AttendanceLog attendanceLog) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        public static void addAttendance(AttendanceLog log) {
+            logs.add(log);
         }
 
-        public AttendanceLog(String empNum, LocalDateTime of, LocalDateTime of0) {
+        public static List<AttendanceLog> getLogsForEmployee(String empNum) {
+            List<AttendanceLog> result = new ArrayList<>();
+            for (AttendanceLog log : logs) {
+                if (log.employeeNumber.equals(empNum)) {
+                    result.add(log);
+                }
+            }
+            return result;
+        }
+
+        public long getWorkedHours() {
+            return Duration.between(timeIn, timeOut).toHours();
+        }
+
+        public static void clearLogs() {
+            logs.clear();
         }
     }
 
     private static class PayrollSystem {
+        public double generatePayslip(Employee emp) {
+            double totalHours = 0.0;
 
-        public PayrollSystem() {
-        }
+            for (AttendanceLog log : AttendanceLog.getLogsForEmployee(emp.getEmployeeNumber())) {
+                totalHours += log.getWorkedHours();
+            }
 
-        private double generatePayslip(Employee emp) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            return totalHours * emp.getHourlyRate();
         }
     }
 }

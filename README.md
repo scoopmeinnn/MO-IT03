@@ -19,27 +19,26 @@ Deliver a desktop-based system with a clean, intuitive Java Swing interface tail
 -Support Modular and Maintainable Development
 Design the application in a modular fashion to allow future enhancements such as database integration, multi-user access, and audit logs.
 
-🎯 Key Features
-🔐 User Authentication – Secure login for HR/Admin access
+Key Features
 
 🕒 Attendance Logging – Tracks employee check-in/out times
 
-💵 Payroll Calculation – Automates salary computation based on attendance and pay rules
+Payroll Calculation – Automates salary computation based on attendance and pay rules
 
-📊 Breakdown Display – Shows daily hours worked, deductions, bonuses
+Breakdown Display – Shows daily hours worked, deductions, bonuses
 
-🧾 Export Reports – Generates payroll summaries in CSV or PDF
+ Export Reports – Generates payroll summaries in CSV or PDF
 
-🖥️ Swing GUI Interface – Easy-to-use desktop interface for non-technical users
+ Swing GUI Interface – Easy-to-use desktop interface for non-technical users
 
-## 🧩 Features
+## Features
 
 - Java Swing GUI for payroll
 - Attendance logging
 - overtime, tax, deduction calculations
 - Admin authentication
 
-## 📁 Project Structure
+##  Project Structure
 motorphemployeeapp/
 ├── src/
 │ └── your Java classes

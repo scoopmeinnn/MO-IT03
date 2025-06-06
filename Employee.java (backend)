@@ -1,0 +1,33 @@
+package backend;
+
+public class Employee {
+    private final String employeeNumber;
+    private final String lastName;
+    private final String firstName;
+    private final String position;
+    private final double hourlyRate;
+
+    public Employee(String employeeNumber, String lastName, String firstName, String position, double hourlyRate) {
+        this.employeeNumber = employeeNumber;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.position = position;
+        this.hourlyRate = hourlyRate;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    public String getEmployeeNumber() {
+        return employeeNumber;
+    }
+
+    public double getHourlyRate() {
+        return hourlyRate;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+}

@@ -14,6 +14,7 @@ package motorphemployeeapp;
  * @author kate
  */
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,96 +22,195 @@ import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
+import java.nio.file.*;
 
 public class MotorPHGUI extends JFrame {
-
     private final JTextField txtEmpNumber;
-
-    private final JTextField txtStartDate;
-    private final JTextField txtEndDate;
-    private final JTextArea txtResult;
+    private final JTextField txtFirstName;
+    private final JTextField txtLastName;
+    private final JTextField txtBirthday;
+    private final JTextField txtHourlyRate;
+    private final JTable employeeTable;
+    private final DefaultTableModel tableModel;
+    private final JButton btnUpdate;
+    private final JButton btnDelete;
 
     public MotorPHGUI() {
         setTitle("MotorPH Employee App");
-        setSize(500, 400);
+        setSize(800, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
-        inputPanel.setBorder(BorderFactory.createTitledBorder("Payslip Generator"));
+        // Create table model
+        String[] columns = {"Employee Number", "First Name", "Last Name", "Birthday", "Hourly Rate"};
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        employeeTable = new JTable(tableModel);
+        JScrollPane tableScrollPane = new JScrollPane(employeeTable);
+        tableScrollPane.setBorder(BorderFactory.createTitledBorder("Employee Records"));
+
+        // Create input panel
+        JPanel inputPanel = new JPanel(new GridLayout(6, 2, 10, 10));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Employee Details"));
 
         txtEmpNumber = new JTextField();
-        txtStartDate = new JTextField();
-        txtEndDate = new JTextField();
+        txtFirstName = new JTextField();
+        txtLastName = new JTextField();
+        txtBirthday = new JTextField();
+        txtHourlyRate = new JTextField();
 
         inputPanel.add(new JLabel("Employee Number (e.g., EMP001):"));
         inputPanel.add(txtEmpNumber);
-        inputPanel.add(new JLabel("Pay Start Date (YYYY-MM-DD):"));
-        inputPanel.add(txtStartDate);
-        inputPanel.add(new JLabel("Pay End Date (YYYY-MM-DD):"));
-        inputPanel.add(txtEndDate);
+        inputPanel.add(new JLabel("First Name:"));
+        inputPanel.add(txtFirstName);
+        inputPanel.add(new JLabel("Last Name:"));
+        inputPanel.add(txtLastName);
+        inputPanel.add(new JLabel("Birthday (YYYY-MM-DD):"));
+        inputPanel.add(txtBirthday);
+        inputPanel.add(new JLabel("Hourly Rate:"));
+        inputPanel.add(txtHourlyRate);
 
-        JButton btnGenerate = new JButton("Generate Payslip");
+        // Create button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton btnAdd = new JButton("Add");
+        btnUpdate = new JButton("Update");
+        btnDelete = new JButton("Delete");
         JButton btnExit = new JButton("Exit");
 
-        inputPanel.add(btnGenerate);
-        inputPanel.add(btnExit);
+        btnUpdate.setEnabled(false);
+        btnDelete.setEnabled(false);
 
-        txtResult = new JTextArea();
-        txtResult.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(txtResult);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Result"));
+        buttonPanel.add(btnAdd);
+        buttonPanel.add(btnUpdate);
+        buttonPanel.add(btnDelete);
+        buttonPanel.add(btnExit);
 
+        // Add components to frame
+        add(tableScrollPane, BorderLayout.CENTER);
         add(inputPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        btnGenerate.addActionListener(e -> generatePayslip());
+        // Add action listeners
+        btnAdd.addActionListener(e -> addEmployee());
+        btnUpdate.addActionListener(e -> updateEmployee());
+        btnDelete.addActionListener(e -> deleteEmployee());
         btnExit.addActionListener(e -> System.exit(0));
+
+        // Add table selection listener
+        employeeTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = employeeTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    txtEmpNumber.setText((String) tableModel.getValueAt(selectedRow, 0));
+                    txtFirstName.setText((String) tableModel.getValueAt(selectedRow, 1));
+                    txtLastName.setText((String) tableModel.getValueAt(selectedRow, 2));
+                    txtBirthday.setText((String) tableModel.getValueAt(selectedRow, 3));
+                    txtHourlyRate.setText(tableModel.getValueAt(selectedRow, 4).toString());
+                    btnUpdate.setEnabled(true);
+                    btnDelete.setEnabled(true);
+                }
+            }
+        });
     }
 
-    private void generatePayslip() {
-        String empNum = txtEmpNumber.getText().trim();
-        String startDateStr = txtStartDate.getText().trim();
-        String endDateStr = txtEndDate.getText().trim();
+    private void addEmployee() {
+        if (!validateInput()) return;
 
-        if (!empNum.matches("EMP\\d{3}")) {
-            showError("Invalid Employee Number. Format must be EMP###.");
-            return;
+        String[] rowData = {
+            txtEmpNumber.getText().trim(),
+            txtFirstName.getText().trim(),
+            txtLastName.getText().trim(),
+            txtBirthday.getText().trim(),
+            txtHourlyRate.getText().trim()
+        };
+
+        tableModel.addRow(rowData);
+        clearInputFields();
+    }
+
+    private void updateEmployee() {
+        if (!validateInput()) return;
+
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow != -1) {
+            tableModel.setValueAt(txtEmpNumber.getText().trim(), selectedRow, 0);
+            tableModel.setValueAt(txtFirstName.getText().trim(), selectedRow, 1);
+            tableModel.setValueAt(txtLastName.getText().trim(), selectedRow, 2);
+            tableModel.setValueAt(txtBirthday.getText().trim(), selectedRow, 3);
+            tableModel.setValueAt(txtHourlyRate.getText().trim(), selectedRow, 4);
+            clearInputFields();
+            btnUpdate.setEnabled(false);
+            btnDelete.setEnabled(false);
         }
+    }
 
-        LocalDate startDate, endDate;
-        try {
-            startDate = LocalDate.parse(startDateStr);
-            endDate = LocalDate.parse(endDateStr);
-            if (endDate.isBefore(startDate)) {
-                showError("End date must not be before start date.");
-                return;
+    private void deleteEmployee() {
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow != -1) {
+            int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete this employee record?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION
+            );
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                tableModel.removeRow(selectedRow);
+                clearInputFields();
+                btnUpdate.setEnabled(false);
+                btnDelete.setEnabled(false);
             }
-        } catch (DateTimeParseException ex) {
-            showError("Invalid date format. Use YYYY-MM-DD.");
-            return;
+        }
+    }
+
+    private boolean validateInput() {
+        if (!txtEmpNumber.getText().trim().matches("EMP\\d{3}")) {
+            showError("Invalid Employee Number. Format must be EMP###.");
+            return false;
         }
 
-        Employee emp = new Employee(empNum, "Plenos", "Catherine", "Agent", 200.0);
+        if (txtFirstName.getText().trim().isEmpty()) {
+            showError("First Name is required.");
+            return false;
+        }
 
-        // Clear previous logs (for demo purposes)
-        AttendanceLog.clearLogs();
+        if (txtLastName.getText().trim().isEmpty()) {
+            showError("Last Name is required.");
+            return false;
+        }
 
-        // Sample logs within range
-        AttendanceLog.addAttendance(new AttendanceLog(empNum,
-                LocalDateTime.of(2025, 5, 14, 9, 0),
-                LocalDateTime.of(2025, 5, 14, 17, 0)));
+        try {
+            LocalDate.parse(txtBirthday.getText().trim());
+        } catch (DateTimeParseException e) {
+            showError("Invalid birthday format. Use YYYY-MM-DD.");
+            return false;
+        }
 
-        AttendanceLog.addAttendance(new AttendanceLog(empNum,
-                LocalDateTime.of(2025, 5, 15, 9, 30),
-                LocalDateTime.of(2025, 5, 15, 18, 0)));
+        try {
+            double rate = Double.parseDouble(txtHourlyRate.getText().trim());
+            if (rate <= 0) {
+                showError("Hourly rate must be greater than 0.");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            showError("Invalid hourly rate. Please enter a valid number.");
+            return false;
+        }
 
-        PayrollSystem payrollSystem = new PayrollSystem();
-        double netPay = payrollSystem.generatePayslip(emp);
+        return true;
+    }
 
-        txtResult.setText("Payslip for: " + emp.getFullName() + "\n" +
-                "Employee Number: " + emp.getEmployeeNumber() + "\n" +
-                "Net Pay: PHP " + String.format("%.2f", netPay));
+    private void clearInputFields() {
+        txtEmpNumber.setText("");
+        txtFirstName.setText("");
+        txtLastName.setText("");
+        txtBirthday.setText("");
+        txtHourlyRate.setText("");
     }
 
     private void showError(String message) {
@@ -122,79 +222,5 @@ public class MotorPHGUI extends JFrame {
             MotorPHGUI app = new MotorPHGUI();
             app.setVisible(true);
         });
-    }
-
-    private static class Employee {
-        private final String employeeNumber;
-        private final String lastName;
-        private final String firstName;
-        private final double hourlyRate;
-
-        public Employee(String employeeNumber, String lastName, String firstName, String position, double hourlyRate) {
-            this.employeeNumber = employeeNumber;
-            this.lastName = lastName;
-            this.firstName = firstName;
-            this.hourlyRate = hourlyRate;
-        }
-
-        public String getFullName() {
-            return firstName + " " + lastName;
-        }
-
-        public String getEmployeeNumber() {
-            return employeeNumber;
-        }
-
-        public double getHourlyRate() {
-            return hourlyRate;
-        }
-    }
-
-    private static class AttendanceLog {
-        private final String employeeNumber;
-        private final LocalDateTime timeIn;
-        private final LocalDateTime timeOut;
-
-        private static final List<AttendanceLog> logs = new ArrayList<>();
-
-        public AttendanceLog(String employeeNumber, LocalDateTime timeIn, LocalDateTime timeOut) {
-            this.employeeNumber = employeeNumber;
-            this.timeIn = timeIn;
-            this.timeOut = timeOut;
-        }
-
-        public static void addAttendance(AttendanceLog log) {
-            logs.add(log);
-        }
-
-        public static List<AttendanceLog> getLogsForEmployee(String empNum) {
-            List<AttendanceLog> result = new ArrayList<>();
-            for (AttendanceLog log : logs) {
-                if (log.employeeNumber.equals(empNum)) {
-                    result.add(log);
-                }
-            }
-            return result;
-        }
-
-        public long getWorkedHours() {
-            return Duration.between(timeIn, timeOut).toHours();
-        }
-
-        public static void clearLogs() {
-            logs.clear();
-        }
-    }
-
-    private static class PayrollSystem {
-        public double generatePayslip(Employee emp) {
-            double totalHours = 0.0;
-
-            for (AttendanceLog log : AttendanceLog.getLogsForEmployee(emp.getEmployeeNumber())) {
-                totalHours += log.getWorkedHours();
-            }
-
-            return totalHours * emp.getHourlyRate();
-        }
     }
 }

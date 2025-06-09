@@ -1,5 +1,5 @@
 package com.motorph.employeeapp;
 
-public class ValidatedPayroll {
+public class ValidatedLeaveRequestGUI {
     
 }

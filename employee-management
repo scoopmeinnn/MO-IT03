@@ -1,0 +1,124 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
+
+public class MotorPHEmployeeApp {
+    private JFrame frame;
+    private JTextField idField, nameField, salaryField;
+    private JTextArea displayArea;
+    private Connection conn;
+
+    public MotorPHEmployeeApp() {
+        frame = new JFrame("MotorPH Employee Management");
+        frame.setLayout(new FlowLayout());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 400);
+
+        // Database setup
+        try {
+            conn = DriverManager.getConnection("jdbc:sqlite:employees.db");
+            Statement stmt = conn.createStatement();
+            stmt.execute("CREATE TABLE IF NOT EXISTS employees (id INTEGER PRIMARY KEY, name TEXT, salary REAL)");
+        } catch (SQLException e) {
+            showError("Database Error: " + e.getMessage());
+        }
+
+        // Components
+        idField = new JTextField(10);
+        nameField = new JTextField(10);
+        salaryField = new JTextField(10);
+        displayArea = new JTextArea(10, 30);
+        displayArea.setEditable(false);
+
+        JButton addButton = new JButton("Add Employee");
+        JButton updateButton = new JButton("Update Employee");
+        JButton deleteButton = new JButton("Delete Employee");
+        JButton viewButton = new JButton("View Employees");
+
+        // Event listeners
+        addButton.addActionListener(e -> addEmployee());
+        updateButton.addActionListener(e -> updateEmployee());
+        deleteButton.addActionListener(e -> deleteEmployee());
+        viewButton.addActionListener(e -> displayEmployees());
+
+        // Add components to frame
+        frame.add(new JLabel("ID:"));
+        frame.add(idField);
+        frame.add(new JLabel("Name:"));
+        frame.add(nameField);
+        frame.add(new JLabel("Salary:"));
+        frame.add(salaryField);
+        frame.add(addButton);
+        frame.add(updateButton);
+        frame.add(deleteButton);
+        frame.add(viewButton);
+        frame.add(new JScrollPane(displayArea));
+
+        frame.setVisible(true);
+    }
+
+    private void addEmployee() {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO employees (name, salary) VALUES (?, ?)");
+            stmt.setString(1, nameField.getText());
+            stmt.setDouble(2, Double.parseDouble(salaryField.getText()));
+            stmt.executeUpdate();
+            showSuccess("Employee added successfully!");
+            displayEmployees();
+        } catch (SQLException | NumberFormatException e) {
+            showError("Error adding employee: " + e.getMessage());
+        }
+    }
+
+    private void updateEmployee() {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("UPDATE employees SET name = ?, salary = ? WHERE id = ?");
+            stmt.setString(1, nameField.getText());
+            stmt.setDouble(2, Double.parseDouble(salaryField.getText()));
+            stmt.setInt(3, Integer.parseInt(idField.getText()));
+            stmt.executeUpdate();
+            showSuccess("Employee updated successfully!");
+            displayEmployees();
+        } catch (SQLException | NumberFormatException e) {
+            showError("Error updating employee: " + e.getMessage());
+        }
+    }
+
+    private void deleteEmployee() {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM employees WHERE id = ?");
+            stmt.setInt(1, Integer.parseInt(idField.getText()));
+            stmt.executeUpdate();
+            showSuccess("Employee deleted successfully!");
+            displayEmployees();
+        } catch (SQLException | NumberFormatException e) {
+            showError("Error deleting employee: " + e.getMessage());
+        }
+    }
+
+    private void displayEmployees() {
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM employees");
+            displayArea.setText("ID | Name | Salary\n-------------------\n");
+            while (rs.next()) {
+                displayArea.append(rs.getInt("id") + " | " + rs.getString("name") + " | " + rs.getDouble("salary") + "\n");
+            }
+        } catch (SQLException e) {
+            showError("Error displaying employees: " + e.getMessage());
+        }
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(frame, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showSuccess(String message) {
+        JOptionPane.showMessageDialog(frame, message, "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void main(String[] args) {
+        new MotorPHEmployeeApp();
+    }
+}

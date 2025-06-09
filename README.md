@@ -21,7 +21,7 @@ Design the application in a modular fashion to allow future enhancements such as
 
 Key Features
 
-🕒 Attendance Logging – Tracks employee check-in/out times
+Attendance Logging – Tracks employee check-in/out times
 
 Payroll Calculation – Automates salary computation based on attendance and pay rules
 

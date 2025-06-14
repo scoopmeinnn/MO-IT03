@@ -1,171 +1,153 @@
 # MotorPH Employee App
+A user-friendly Java Swing desktop application for managing employee payroll, attendance, and salary components at MotorPH.
 
-This is a simple Java-based payroll management and employee app system built for the MotorPH IT03 project.
+---
 
-**Project Overview**
-The MotorPH Employee Management System represents a Java-based desktop application specifically designed to efficiently manage employee payroll, attendance, and salary components for MotorPH. This system features a graphical user interface (GUI) developed using Java Swing, which facilitates the streamlining of various human resources tasks, including attendance logging, payroll calculation, and reporting.
-MotorPH Employee App (GUI Version) – Code Documentation
- Repository Link: https://github.com/scoopmeinnn/MO-IT03.git
- 
-1. Project Overview
-A Java Swing desktop application implementing an Employee Management System with CRUD operations for Employees, Payroll, and Leave Requests. It uses CSV files (employees.csv, payroll.csv, leaverequests.csv) for data persistence. Full Create, Read, Update, and Delete functionality is included.
+## Table of Contents
 
-2. Setup & Running
-Requirements:
-Java Development Kit (JDK) 8 or higher
+- [Overview](#overview)
+- [Features](#features)
+- [Setup & Running](#setup--running)
+- [Usage](#usage)
+- [Code Structure](#code-structure)
+- [CSV Files](#csv-files)
+- [Functionality Details](#functionality-details)
+- [Edge Cases & Validation](#edge-cases--validation)
+- [Recommended Improvements (Future Work)](#recommended-improvements-future-work)
+- [Summary](#summary)
+- [License](#license)
 
+---
 
-Code is on GitHub, in the branch: feature/gui-crud
-How to Run:
+## Project Overview
+
+The MotorPH Employee Management System is a Java-based desktop application that provides an efficient way to manage employee payroll, attendance, and salary for MotorPH. It includes a graphical user interface (GUI) for ease of use and stores data in CSV files.
+https://github.com/scoopmeinnn/MO-IT03.git****
+---
+
+## Features
+
+- Secure login system
+- Employee management (CRUD)
+- Payroll management (CRUD)
+- Leave request management (CRUD)
+- Data persistence using CSV files
+- Input validation for important fields
+- Friendly tabbed interface
+
+---
+
+## Setup & Running
+
+**Requirements:**
+- Java Development Kit (JDK) 8 or higher
+- Git
+
+**Clone and Run:**
+```sh
 git clone https://github.com/scoopmeinnn/MO-IT03.git
 cd MO-IT03
 git checkout feature/gui-crud
 javac -d . motorphemployeeapp/src/com/motorph/employeeapp/*.java
 java com.motorph.employeeapp.AppGUI
+```
 
-Login credentials:
-Username: admin
-Password: admin123
+**Default Login Credentials:**
+- Username: `admin`
+- Password: `admin123`
 
-Once logged in, the app displays three tabs: Employees, Payroll, Leave Requests.
+---
 
- Code Structure
+## Usage
+
+After logging in, you will see three tabs:
+
+1. **Employees** - Manage employee records
+2. **Payroll** - Manage payroll entries
+3. **Leave Requests** - Manage employee leave requests
+
+---
+
+## Code Structure
+
+```
 motorphemployeeapp/
-![image](https://github.com/user-attachments/assets/28c0e429-d204-40ca-aedc-2c38dee88a78)
+└── src/
+    └── com/
+        └── motorph/
+            └── employeeapp/
+                ├── AppGUI.java
+                ├── LoginDialog.java
+                ├── ValidatedEmployeeGUI.java
+                ├── ValidatedPayrollGUI.java
+                └── ValidatedLeaveRequestGUI.java
+```
+![App Screenshot](https://github.com/user-attachments/assets/28c0e429-d204-40ca-aedc-2c38dee88a78)
 
+---
 
-CSV Files (auto-created on first use):
+## CSV Files
+
+These files are auto-created on first use:
+
 - `employees.csv`
 - `payroll.csv`
 - `leaverequests.csv`
 
+---
 
+## Functionality Details
 
-Functionality Details
-LoginDialog.java
-Creates a modal JDialog with username/password fields:
+### Login
 
+- Modal login dialog with username/password fields
+- Hardcoded credentials: `admin` / `admin123`
+- Success/failure feedback to user
 
-admin/admin123 is the hard-coded credential.
+### Employees
 
+- Display employee data in a table
+- **Add**: Append new employee; requires all fields, unique employee ID
+- **Update**: Edit selected employee
+- **Delete**: Remove employee after confirmation
 
-Uses succeeded boolean to indicate login success.
+### Payroll
 
+- Display payroll entries
+- **Add**: Append new payroll entry; validates numeric amount
+- **Update/Delete**: Edit or remove entries quickly
 
-LoginDialog.this.dispose() will close the dialog.
+### Leave Requests
 
+- Display leave requests
+- **Add**: Submit new request; all fields required
+- **Update/Delete**: Edit or remove requests
 
-AppGUI.java
-Launches GUI via SwingUtilities.invokeLater.
+---
 
+## Edge Cases & Validation
 
-Displays 3 tabs with:
+- Prevents employee ID collision
+- Alerts for empty required fields
+- Warns if payroll amount is not a number
+- CSV header recreated if missing file
 
+---
 
-ValidatedEmployeeGUI
+## Recommended Improvements (Future Work)
 
+- Replace CSV backend with a database (JDBC/SQLite/MySQL)
+- Add date picker for leave dates
+- Improve UI/UX and validation feedback
+- Add search/filter in tables
+- Support user roles (manager, employee)
+- Package as deployable JAR
 
-ValidatedPayrollGUI
+---
 
+## Summary
 
-ValidatedLeaveRequestGUI
+- Complete GUI-based application with login and tabbed interface
+- CRUD operations for Employees, Payroll, Leave Requests
+- All code in `feature/gui-crud` branch
 
-
-Uses a shared Department instance for context.
-
-
-
-ValidatedEmployeeGUI.java
-Displays employee data in a JTable.
-
-
-Add: appends a new row to employees.csv.
-
-
-Update: updates selected row via popup dialog; overwrites CSV.
-
-
-Delete: removes selected row from CSV after confirmation.
-
-
-Validation: requires all fields, ensures employee ID is unique.
-
-
-Loading: on initialization and after operations, loads CSV into table.
-
-
-
-ValidatedPayrollGUI.java
-Similar to Employees GUI, but columns: Employee ID, Amount.
-
-
-Add: appends payroll entry; ensures numeric amount.
-
-
-Update / Delete: quick in-place operations on selected entry.
-
-
-Reloads table on data modification.
-
-
-
-ValidatedLeaveRequestGUI.java
-Columns: Employee ID, Start Date, End Date, Reason.
-
-
-Submit (Add): adds new row; requires all fields.
-
-
-Update: allow editing of start/end date + reason.
-
-
-Delete: confirmation before removal.
-
-
-CSV file reloaded after each operation.
-
-
-
-5. Edge Cases & Validation
-ID collision: prevented via popup alerts.
-
-
-Empty field submission: alerts user to fill required inputs.
-
-
-Invalid number in Amount (Payroll): shows a warning popup.
-
-
-Date fields: user responsibility; code does not enforce date pattern but warns if empty.
-
-
-Files handle both missing & existing CSVs: header is recreated if file doesn't exist.
-
-
-
-6. Recommended Improvements (Future Work)
-Replace CSV backend with a proper database via JDBC (e.g., SQLite or MySQL).
-
-
-Add date picker UI for leave date selection.
-
-
-Improve UI/UX with layout constraints, form clearing, input validation feedback.
-
-
-Add search/filter capabilities in tables.
-
-
-Support user roles—e.g., manager vs employee permissions.
-
-
-Deployable JAR packaging for easy distribution.
-
-7.  Summary
-All code lives in feature/gui-crud. Main branch is untouched.
-
-
-Complete GUI with login and 3 tabs.
-
-
-CRUD fully implemented with data persistence.

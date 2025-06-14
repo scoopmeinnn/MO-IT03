@@ -31,13 +31,8 @@ Once logged in, the app displays three tabs: Employees, Payroll, Leave Requests.
 
  Code Structure
 motorphemployeeapp/
-└─ src/com/motorph/employeeapp/
-   ├─ AppGUI.java              # Main launcher with login and tab panes
-   ├─ LoginDialog.java        # Modal login dialog
-   ├─ Department.java         # Shared model class for department
-   ├─ ValidatedEmployeeGUI.java       # GUI, CRUD, CSV I/O for employees
-   ├─ ValidatedPayrollGUI.java        # GUI, CRUD, CSV I/O for payroll
-   └─ ValidatedLeaveRequestGUI.java   # GUI, CRUD, CSV I/O for leave requests
+![image](https://github.com/user-attachments/assets/28c0e429-d204-40ca-aedc-2c38dee88a78)
+
 
 CSV Files (auto-created on first use):
 - `employees.csv`

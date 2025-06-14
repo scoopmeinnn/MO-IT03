@@ -4,76 +4,47 @@ This is a simple Java-based payroll management and employee app system built for
 
 **Project Overview**
 The MotorPH Employee Management System represents a Java-based desktop application specifically designed to efficiently manage employee payroll, attendance, and salary components for MotorPH. This system features a graphical user interface (GUI) developed using Java Swing, which facilitates the streamlining of various human resources tasks, including attendance logging, payroll calculation, and reporting.
+MotorPH Employee App (GUI Version) – Code Documentation
+ Repository Link: https://github.com/scoopmeinnn/MO-IT03.git
+ 
+1.Branch Name: feature/gui-crud
+Java Swing desktop application implementing an Employee Management System with CRUD operations for Employees, Payroll, and Leave Requests. It uses CSV files (employees.csv, payroll.csv, leaverequests.csv) for data persistence. Full Create, Read, Update, and Delete functionality is included.
 
-**Project Goals**
--Automate Payroll Processing
-Eliminate manual computation of salaries by automating the calculation of gross pay, deductions (tax, SSS, etc.), overtime, and bonuses based on attendance data.
--Simplify Employee Attendance Tracking
-Provide a user-friendly interface for logging employee time-in and time-out records to ensure accurate and real-time attendance data.
--Enable Accurate and Transparent Reporting
-Generate payroll reports and breakdowns (daily, weekly, monthly) that are easy to interpret and can be exported as CSV or PDF for official records.
--Ensure Data Security and Access Control
-Protect payroll data with a secure login system, allowing only authorized users (e.g., HR/Admin) to access and manage sensitive employee information.
--Enhance Usability Through GUI Design
-Deliver a desktop-based system with a clean, intuitive Java Swing interface tailored for HR or payroll personnel without requiring technical expertise.
--Support Modular and Maintainable Development
-Design the application in a modular fashion to allow future enhancements such as database integration, multi-user access, and audit logs.
+2. Setup & Running
+Requirements:
+Java Development Kit (JDK) 8 or higher
 
-Key Features
 
-Attendance Logging – Tracks employee check-in/out times
+Code is on GitHub, in the branch: feature/gui-crud
+How to Run:
+git clone https://github.com/scoopmeinnn/MO-IT03.git
+cd MO-IT03
+git checkout feature/gui-crud
+javac -d . motorphemployeeapp/src/com/motorph/employeeapp/*.java
+java com.motorph.employeeapp.AppGUI
 
-Payroll Calculation – Automates salary computation based on attendance and pay rules
+Login credentials:
+Username: admin
+Password: admin123
 
-Breakdown Display – Shows daily hours worked, deductions, bonuses
+Once logged in, the app displays three tabs: Employees, Payroll, Leave Requests.
 
- Export Reports – Generates payroll summaries in CSV or PDF
-
- Swing GUI Interface – Easy-to-use desktop interface for non-technical users
-
-## Features
-
-- Java Swing GUI for payroll
-- Attendance logging
-- overtime, tax, deduction calculations
-- Admin authentication
-
-##  Project Structure
+ Code Structure
 motorphemployeeapp/
-├── src/
-│ └── your Java classes
-├── README.md
+└─ src/com/motorph/employeeapp/
+   ├─ AppGUI.java              # Main launcher with login and tab panes
+   ├─ LoginDialog.java        # Modal login dialog
+   ├─ Department.java         # Shared model class for department
+   ├─ ValidatedEmployeeGUI.java       # GUI, CRUD, CSV I/O for employees
+   ├─ ValidatedPayrollGUI.java        # GUI, CRUD, CSV I/O for payroll
+   └─ ValidatedLeaveRequestGUI.java   # GUI, CRUD, CSV I/O for leave requests
 
-Initial Architecture Diagram (Text Description)
-+------------------------+
-|      User/Admin       |
-+-----------+------------+
-            |
-            v
-+-----------+------------+
-|       Java Swing GUI   |
-| (Login, Attendance,    |
-|  Payroll Screens)      |
-+-----------+------------+
-            |
-            v
-+-----------+------------+
-|   Application Logic    |
-| (Controllers/Services) |
-+-----------+------------+
-            |
-     +------+------+
-     |             |
-     v             v
-+----+----+    +---+-----------------+
-| Payroll |    | Attendance Manager  |
-| Engine  |    | (Time-in/out Logs)  |
-+----+----+    +---+-----------------+
-     |              |
-     v              v
-+-------------------+---------------+
-|   In-Memory Data Store or Files   |
-|  (CSV, TXT, or Serialized Objects)|
-+-----------------------------------+
+CSV Files (auto-created on first use):
+- `employees.csv`
+- `payroll.csv`
+- `leaverequests.csv`
+
+
+
 
 
